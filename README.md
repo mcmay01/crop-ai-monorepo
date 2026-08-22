@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.icons8.com/fluency/96/000000/plant--v2.png" alt="Crop-AI Logo" width="80" />
+  <img src="https://img.icons8.com/fluency/96/flower" alt="Crop-AI Logo" width="80" />
   <h1 align="center">🌾 Crop-AI</h1>
   <p align="center">
     <strong>Intelligent Crop Disease Detection</strong><br />
