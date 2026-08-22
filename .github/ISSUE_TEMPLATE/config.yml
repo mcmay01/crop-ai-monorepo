@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/mcmay01/crop-ai-monorepo/discussions
+    about: Ask questions, share ideas, or get help from the community
+  - name: 📖 Documentation
+    url: https://github.com/mcmay01/crop-ai-monorepo#readme
+    about: Check the README for setup and usage guides
