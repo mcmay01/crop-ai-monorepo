@@ -13,7 +13,7 @@ We release patches for security vulnerabilities in the latest major version of C
 
 We take security seriously. If you discover a security vulnerability in Crop-AI, please report it privately.
 
-**Please DO NOT file a public issue.** Instead, send an email to **[your-security-email@example.com]** with:
+**Please DO NOT file a public issue.** Instead, send an email to **[hi@mahadmayanja.com]** with:
 
 - A clear description of the vulnerability.
 - Steps to reproduce it (proof-of-concept code is highly appreciated).
