@@ -1,32 +1,71 @@
 services:
   postgres:
     image: postgres:17-alpine
-    ports: ['5432:5432']
+    container_name: crop-ai-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-cropuser}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-croppass}
       POSTGRES_DB: ${POSTGRES_DB:-cropai}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crop-ai-network
 
   redis:
     image: redis:7-alpine
-    ports: ['6379:6379']
+    container_name: crop-ai-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    networks:
+      - crop-ai-network
 
   ai-service:
     build:
-      context: ./apps/ai-service # ⚠️ see note below
+      context: ./apps/ai-service
       dockerfile: Dockerfile
-    ports: ['8000:8000']
+    container_name: crop-ai-python
+    restart: unless-stopped
     environment:
       - MODEL_PATH=/app/models/crop-disease.onnx
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./apps/ai-service:/app
+      - /app/__pycache__
+    networks:
+      - crop-ai-network
 
   backend:
     build:
-      context: ./apps/backend # ⚠️ see note below
+      context: ./apps/backend
       dockerfile: Dockerfile
-    ports: ['3000:3000']
-    depends_on: [postgres, redis, ai-service]
+    container_name: crop-ai-nestjs
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - ai-service
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-cropuser}:${POSTGRES_PASSWORD:-croppass}@postgres:5432/${POSTGRES_DB:-cropai}
       - REDIS_URL=redis://redis:6379
       - PYTHON_AI_URL=http://ai-service:8000/predict
       - JWT_SECRET=${JWT_SECRET:-supersecretkey}
+      - PORT=3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+    networks:
+      - crop-ai-network
+
+volumes:
+  postgres_data:
+
+networks:
+  crop-ai-network:
+    driver: bridge
