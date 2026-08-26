@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "apps/backend",
-    "apps/mobile"
+    "apps/mobile",
+    "packages/shared-types"
   ],
   "scripts": {
     "dev:backend": "npm run start:dev --workspace=apps/backend",
