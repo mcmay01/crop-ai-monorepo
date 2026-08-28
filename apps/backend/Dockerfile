@@ -1,35 +1,34 @@
-# Use Node.js 22 LTS
+# Build stage
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy root package files first for better caching
-COPY package*.json ./
-COPY apps/backend/package*.json ./apps/backend/
-COPY packages/shared-types/package*.json ./packages/shared-types/ 2>/dev/null || true
+# Copy workspace manifests so npm can resolve the shared-types workspace
+COPY package.json package-lock.json ./
+COPY apps/backend/package.json apps/backend/
+COPY packages/shared-types/package.json packages/shared-types/
+COPY apps/mobile/package.json apps/mobile/
 
-# Install dependencies
-RUN npm install
+# Install only the workspaces the backend needs
+RUN npm install --workspace=apps/backend --workspace=packages/shared-types
 
-# Copy source code
-COPY . .
+# Copy sources
+COPY packages/shared-types packages/shared-types
+COPY apps/backend apps/backend
 
-# Build the backend
+# Build shared types first (the backend imports its types)
+RUN npm run build --workspace=packages/shared-types
 RUN npm run build --workspace=apps/backend
 
-# ---------- Production image ----------
+# Production stage
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy built artifacts from builder
-COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
-COPY --from=builder /app/apps/backend/package*.json ./apps/backend/
+COPY --from=builder /app/apps/backend/dist ./dist
+COPY --from=builder /app/apps/backend/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages ./packages
-
-WORKDIR /app/apps/backend
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]

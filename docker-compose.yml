@@ -41,8 +41,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/backend/Dockerfile
     container_name: crop-ai-nestjs
     restart: unless-stopped
     depends_on:
@@ -57,9 +57,6 @@ services:
       - PORT=3000
     ports:
       - '3000:3000'
-    volumes:
-      - ./apps/backend:/app
-      - /app/node_modules
     networks:
       - crop-ai-network
 
